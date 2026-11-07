@@ -1,0 +1,69 @@
+import api from '@/services/api.service'
+
+import type {
+  ApiCollection,
+  ApiPaginatedCollection,
+  ApiResource,
+} from '@/types/api.types'
+
+import type {
+  {{MODULE_SINGULAR_PASCAL}},
+  {{MODULE_SINGULAR_PASCAL}}CreatePayload,
+  {{MODULE_SINGULAR_PASCAL}}Filters,
+  {{MODULE_SINGULAR_PASCAL}}UpdatePayload,
+} from '../types/{{MODULE_NAME_KEBAB}}.types'
+
+export const {{MODULE_NAME_PASCAL}}Service = {
+  async index(
+    params: {{MODULE_SINGULAR_PASCAL}}Filters = {},
+  ): Promise<ApiPaginatedCollection<{{MODULE_SINGULAR_PASCAL}}>> {
+    const response = await api.get<
+      ApiPaginatedCollection<{{MODULE_SINGULAR_PASCAL}}>
+    >('/{{MODULE_NAME_KEBAB}}', { params })
+
+    return response.data
+  },
+
+  async all(): Promise<ApiCollection<{{MODULE_SINGULAR_PASCAL}}>> {
+    const response = await api.get<
+      ApiCollection<{{MODULE_SINGULAR_PASCAL}}>
+    >('/{{MODULE_NAME_KEBAB}}/all')
+
+    return response.data
+  },
+
+  async show(
+    uuid: string,
+  ): Promise<ApiResource<{{MODULE_SINGULAR_PASCAL}}>> {
+    const response = await api.get<
+      ApiResource<{{MODULE_SINGULAR_PASCAL}}>
+    >(`/{{MODULE_NAME_KEBAB}}/${uuid}`)
+
+    return response.data
+  },
+
+  async store(
+    data: {{MODULE_SINGULAR_PASCAL}}CreatePayload,
+  ): Promise<ApiResource<{{MODULE_SINGULAR_PASCAL}}>> {
+    const response = await api.post<
+      ApiResource<{{MODULE_SINGULAR_PASCAL}}>
+    >('/{{MODULE_NAME_KEBAB}}', data)
+
+    return response.data
+  },
+
+  async update(
+    uuid: string,
+    data: {{MODULE_SINGULAR_PASCAL}}UpdatePayload,
+  ): Promise<ApiResource<{{MODULE_SINGULAR_PASCAL}}>> {
+    const response = await api.put<
+      ApiResource<{{MODULE_SINGULAR_PASCAL}}>
+    >(`/{{MODULE_NAME_KEBAB}}/${uuid}`, data)
+
+    return response.data
+  },
+
+  async destroy(uuid: string): Promise<void> {
+    await api.delete(`/{{MODULE_NAME_KEBAB}}/${uuid}`)
+  },
+}

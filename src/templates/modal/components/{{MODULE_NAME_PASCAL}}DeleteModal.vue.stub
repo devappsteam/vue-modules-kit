@@ -1,0 +1,214 @@
+<script setup lang="ts">
+import { computed, ref, watch } from 'vue'
+
+import { AlertTriangle, LoaderCircle, Trash2, X } from '@lucide/vue'
+
+import type { {{MODULE_SINGULAR_PASCAL}} } from '../types/{{MODULE_NAME_KEBAB}}.types'
+
+const props = withDefaults(
+  defineProps<{
+    open: boolean
+    {{MODULE_SINGULAR_CAMEL}}?: {{MODULE_SINGULAR_PASCAL}} | null
+    loading?: boolean
+  }>(),
+  {
+    {{MODULE_SINGULAR_CAMEL}}: null,
+    loading: false,
+  },
+)
+
+const emit = defineEmits<{
+  close: []
+  confirm: []
+}>()
+
+const confirmation = ref('')
+const expectedValue = computed(
+  () => props.{{MODULE_SINGULAR_CAMEL}}?.name ?? '',
+)
+const isConfirmed = computed(
+  () =>
+    Boolean(expectedValue.value) &&
+    confirmation.value.trim() === expectedValue.value,
+)
+const hasConfirmationInput = computed(
+  () => confirmation.value.trim().length > 0,
+)
+
+watch(
+  () => props.open,
+  (open) => {
+    if (open) confirmation.value = ''
+  },
+)
+
+function handleClose() {
+  if (props.loading) return
+  confirmation.value = ''
+  emit('close')
+}
+
+function handleConfirm() {
+  if (isConfirmed.value && !props.loading) emit('confirm')
+}
+</script>
+
+<template>
+  <Teleport to="body">
+    <Transition name="modal">
+      <div
+        v-if="open"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4"
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="delete-{{MODULE_NAME_KEBAB}}-title"
+        aria-describedby="delete-{{MODULE_NAME_KEBAB}}-description"
+      >
+        <div
+          class="absolute inset-0 bg-slate-950/40 backdrop-blur-[1px]"
+          @click="handleClose"
+        />
+
+        <div
+          class="relative w-full max-w-lg overflow-hidden rounded-xl bg-white shadow-2xl"
+        >
+          <div class="flex items-start justify-between px-6 pb-2 pt-6">
+            <div class="flex gap-4">
+              <div
+                class="flex size-10 shrink-0 items-center justify-center rounded-full bg-rose-50 text-rose-600"
+              >
+                <AlertTriangle class="size-5" aria-hidden="true" />
+              </div>
+              <div>
+                <h2
+                  id="delete-{{MODULE_NAME_KEBAB}}-title"
+                  class="text-base font-semibold text-slate-900"
+                >
+                  Excluir {{MODULE_SINGULAR_TITLE}}
+                </h2>
+                <p
+                  id="delete-{{MODULE_NAME_KEBAB}}-description"
+                  class="mt-1 text-sm leading-6 text-slate-500"
+                >
+                  Esta ação é permanente e não poderá ser desfeita.
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              aria-label="Fechar janela"
+              :disabled="loading"
+              class="rounded-md p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-50"
+              @click="handleClose"
+            >
+              <X class="size-5" aria-hidden="true" />
+            </button>
+          </div>
+
+          <div class="px-6 py-5">
+            <div class="rounded-lg border border-rose-100 bg-rose-50/50 p-4">
+              <p class="text-sm text-slate-600">
+                Você está prestes a excluir permanentemente:
+              </p>
+              <p class="mt-1 font-medium text-slate-900">
+                {{ {{MODULE_SINGULAR_CAMEL}}?.name || 'Registro' }}
+              </p>
+              <p
+                v-if="{{MODULE_SINGULAR_CAMEL}}?.description"
+                class="mt-1 text-sm text-slate-500"
+              >
+                {{ {{MODULE_SINGULAR_CAMEL}}.description }}
+              </p>
+            </div>
+
+            <div class="mt-5">
+              <label
+                for="delete-{{MODULE_NAME_KEBAB}}-confirmation"
+                class="block text-sm leading-6 text-slate-700"
+              >
+                Para confirmar, digite
+                <span class="font-semibold text-slate-900">{{
+                  expectedValue
+                }}</span>
+                abaixo.
+              </label>
+              <input
+                id="delete-{{MODULE_NAME_KEBAB}}-confirmation"
+                v-model="confirmation"
+                type="text"
+                autocomplete="off"
+                :placeholder="expectedValue"
+                :disabled="loading"
+                class="mt-3 h-10 w-full rounded-lg border px-3 text-sm outline-none disabled:bg-slate-50"
+                :class="
+                  hasConfirmationInput && !isConfirmed
+                    ? 'border-rose-300 focus:ring-2 focus:ring-rose-100'
+                    : 'border-slate-200 focus:ring-2 focus:ring-slate-200'
+                "
+                @keyup.enter="handleConfirm"
+              />
+              <p
+                v-if="hasConfirmationInput && !isConfirmed"
+                class="mt-2 text-xs text-rose-600"
+              >
+                O nome informado não corresponde ao registro.
+              </p>
+            </div>
+          </div>
+
+          <div
+            class="flex flex-col-reverse gap-2 border-t border-slate-200 bg-slate-50/50 px-6 py-4 sm:flex-row sm:justify-end"
+          >
+            <button
+              type="button"
+              :disabled="loading"
+              class="h-9 rounded-md border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 disabled:opacity-50"
+              @click="handleClose"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              :disabled="!isConfirmed || loading"
+              class="inline-flex h-9 items-center justify-center gap-2 rounded-md bg-rose-600 px-4 text-sm font-medium text-white hover:bg-rose-700 disabled:opacity-50"
+              @click="handleConfirm"
+            >
+              <LoaderCircle
+                v-if="loading"
+                class="size-4 animate-spin"
+                aria-hidden="true"
+              />
+              <Trash2 v-else class="size-4" aria-hidden="true" />
+              Excluir permanentemente
+            </button>
+          </div>
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
+</template>
+
+<style scoped>
+.modal-enter-active,
+.modal-leave-active {
+  transition: opacity 150ms ease;
+}
+
+.modal-enter-active > div:last-child,
+.modal-leave-active > div:last-child {
+  transition:
+    transform 150ms ease,
+    opacity 150ms ease;
+}
+
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+}
+
+.modal-enter-from > div:last-child,
+.modal-leave-to > div:last-child {
+  transform: scale(0.98) translateY(4px);
+  opacity: 0;
+}
+</style>

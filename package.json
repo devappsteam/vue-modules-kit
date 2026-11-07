@@ -1,0 +1,44 @@
+{
+  "name": "vue-modules-kit",
+  "version": "0.1.0",
+  "description": "Generate standardized Vue 3 modules from reusable templates.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devappsteam/vue-modules-kit.git"
+  },
+  "type": "module",
+  "bin": {
+    "vue-modules-kit": "./dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@10.10.0",
+  "scripts": {
+    "build": "node scripts/clean-dist.mjs && tsc -p tsconfig.build.json && node scripts/copy-templates.mjs",
+    "prepare": "npm run build",
+    "create:module": "node dist/cli.js create",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint .",
+    "format:check": "prettier --check ."
+  },
+  "dependencies": {
+    "chalk": "^5.4.1",
+    "commander": "^13.1.0",
+    "pluralize": "^8.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.24.0",
+    "@types/node": "^22.14.0",
+    "@types/pluralize": "^0.0.33",
+    "eslint": "^9.24.0",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.29.1",
+    "vitest": "^3.1.1"
+  }
+}

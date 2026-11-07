@@ -1,0 +1,112 @@
+import { defineStore } from 'pinia'
+
+import type { PaginationMeta } from '@/types/api.types'
+
+import { {{MODULE_NAME_PASCAL}}Service } from '../services/{{MODULE_NAME_KEBAB}}.service'
+
+import type {
+  {{MODULE_SINGULAR_PASCAL}},
+  {{MODULE_SINGULAR_PASCAL}}CreatePayload,
+  {{MODULE_SINGULAR_PASCAL}}Filters,
+  {{MODULE_SINGULAR_PASCAL}}UpdatePayload,
+} from '../types/{{MODULE_NAME_KEBAB}}.types'
+
+export const use{{MODULE_NAME_PASCAL}}Store = defineStore(
+  '{{MODULE_NAME_KEBAB}}',
+  {
+    state: () => ({
+      {{MODULE_NAME_CAMEL}}:
+        [] as {{MODULE_SINGULAR_PASCAL}}[],
+
+      pagination: {
+        current_page: 1,
+        from: null,
+        last_page: 1,
+        per_page: 15,
+        to: null,
+        total: 0,
+      } as PaginationMeta,
+
+      loading: false,
+      saving: false,
+      deletingUuid: null as string | null,
+    }),
+
+    actions: {
+      async fetch{{MODULE_NAME_PASCAL}}(
+        params: {{MODULE_SINGULAR_PASCAL}}Filters = {},
+      ) {
+        this.loading = true
+
+        try {
+          const response =
+            await {{MODULE_NAME_PASCAL}}Service.index(params)
+
+          this.{{MODULE_NAME_CAMEL}} = response.data
+          this.pagination = response.meta
+        } finally {
+          this.loading = false
+        }
+      },
+
+      async create{{MODULE_SINGULAR_PASCAL}}(
+        data: {{MODULE_SINGULAR_PASCAL}}CreatePayload,
+      ) {
+        this.saving = true
+
+        try {
+          await {{MODULE_NAME_PASCAL}}Service.store(data)
+
+          await this.fetch{{MODULE_NAME_PASCAL}}({
+            page: this.pagination.current_page,
+            per_page: this.pagination.per_page,
+          })
+        } finally {
+          this.saving = false
+        }
+      },
+
+      async update{{MODULE_SINGULAR_PASCAL}}(
+        uuid: string,
+        data: {{MODULE_SINGULAR_PASCAL}}UpdatePayload,
+      ) {
+        this.saving = true
+
+        try {
+          await {{MODULE_NAME_PASCAL}}Service.update(uuid, data)
+
+          await this.fetch{{MODULE_NAME_PASCAL}}({
+            page: this.pagination.current_page,
+            per_page: this.pagination.per_page,
+          })
+        } finally {
+          this.saving = false
+        }
+      },
+
+      async delete{{MODULE_SINGULAR_PASCAL}}(uuid: string) {
+        this.deletingUuid = uuid
+
+        try {
+          await {{MODULE_NAME_PASCAL}}Service.destroy(uuid)
+
+          await this.fetch{{MODULE_NAME_PASCAL}}({
+            page: this.pagination.current_page,
+            per_page: this.pagination.per_page,
+          })
+        } finally {
+          this.deletingUuid = null
+        }
+      },
+
+      async find{{MODULE_SINGULAR_PASCAL}}(
+        uuid: string,
+      ): Promise<{{MODULE_SINGULAR_PASCAL}}> {
+        const response =
+          await {{MODULE_NAME_PASCAL}}Service.show(uuid)
+
+        return response.data
+      },
+    },
+  },
+)

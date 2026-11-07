@@ -1,0 +1,15 @@
+import type { RouteRecordRaw } from 'vue-router'
+
+export const {{MODULE_NAME_CAMEL}}Router: RouteRecordRaw[] = [
+  {
+    path: '/{{MODULE_NAME_KEBAB}}',
+    name: '{{MODULE_NAME_KEBAB}}',
+    component: () => import('./views/{{MODULE_NAME_PASCAL}}View.vue'),
+    meta: {
+      title: '{{MODULE_PLURAL_TITLE}}',
+      layout: 'default',
+      guestOnly: false,
+      requiresAuth: true,
+    },
+  },
+]

@@ -1,0 +1,28 @@
+import type { PaginationParams } from '@/types/api.types'
+
+export interface {{MODULE_SINGULAR_PASCAL}} {
+  uuid: string
+  name: string
+  description: string | null
+  is_active: boolean
+  created_at: string
+  updated_at: string
+  deleted_at: string | null
+}
+
+export interface {{MODULE_SINGULAR_PASCAL}}CreatePayload {
+  name: string
+  description?: string | null
+  is_active: boolean
+}
+
+export interface {{MODULE_SINGULAR_PASCAL}}UpdatePayload {
+  name: string
+  description?: string | null
+  is_active: boolean
+}
+
+export interface {{MODULE_SINGULAR_PASCAL}}Filters extends PaginationParams {
+  search?: string
+  is_active?: boolean
+}

@@ -1,0 +1,130 @@
+<script setup lang="ts">
+import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
+
+import { useToast } from '@/composables/useToast'
+import { getApiErrorMessage } from '@/utils/api-error'
+
+import {{MODULE_NAME_PASCAL}}List from '../components/{{MODULE_NAME_PASCAL}}List.vue'
+import {{MODULE_NAME_PASCAL}}DeleteModal from '../components/{{MODULE_NAME_PASCAL}}DeleteModal.vue'
+
+import { use{{MODULE_NAME_PASCAL}}Store } from '../stores/{{MODULE_NAME_KEBAB}}.store'
+
+import type { {{MODULE_SINGULAR_PASCAL}} } from '../types/{{MODULE_NAME_KEBAB}}.types'
+
+const {{MODULE_NAME_CAMEL}}Store =
+  use{{MODULE_NAME_PASCAL}}Store()
+const { addToast } = useToast()
+const router = useRouter()
+
+const isDeleteModalOpen = ref(false)
+const {{MODULE_SINGULAR_CAMEL}}ToDelete =
+  ref<{{MODULE_SINGULAR_PASCAL}} | null>(null)
+
+function handleCreate() {
+  void router.push({ name: '{{MODULE_NAME_KEBAB}}-create' })
+}
+
+function handleEdit(record: {{MODULE_SINGULAR_PASCAL}}) {
+  void router.push({
+    name: '{{MODULE_NAME_KEBAB}}-edit',
+    params: { uuid: record.uuid },
+  })
+}
+
+function handleDelete(record: {{MODULE_SINGULAR_PASCAL}}) {
+  {{MODULE_SINGULAR_CAMEL}}ToDelete.value = record
+  isDeleteModalOpen.value = true
+}
+
+function closeDeleteModal() {
+  if ({{MODULE_NAME_CAMEL}}Store.deletingUuid) {
+    return
+  }
+
+  isDeleteModalOpen.value = false
+  {{MODULE_SINGULAR_CAMEL}}ToDelete.value = null
+}
+
+async function confirmDelete() {
+  if (!{{MODULE_SINGULAR_CAMEL}}ToDelete.value) {
+    return
+  }
+
+  try {
+    await {{MODULE_NAME_CAMEL}}Store.delete{{MODULE_SINGULAR_PASCAL}}(
+      {{MODULE_SINGULAR_CAMEL}}ToDelete.value.uuid,
+    )
+    closeDeleteModal()
+    addToast('Registro excluído com sucesso!', 'success')
+  } catch (error) {
+    addToast(
+      getApiErrorMessage(error, 'Não foi possível excluir o registro.'),
+      'error',
+    )
+  }
+}
+
+async function handlePageChange(page: number) {
+  try {
+    await {{MODULE_NAME_CAMEL}}Store.fetch{{MODULE_NAME_PASCAL}}(
+      {
+        page,
+        per_page: {{MODULE_NAME_CAMEL}}Store.pagination.per_page,
+      },
+    )
+  } catch (error) {
+    addToast(
+      getApiErrorMessage(error, 'Não foi possível carregar os registros.'),
+      'error',
+    )
+  }
+}
+
+async function handleSearch(search: string) {
+  try {
+    await {{MODULE_NAME_CAMEL}}Store.fetch{{MODULE_NAME_PASCAL}}(
+      {
+        page: 1,
+        per_page: {{MODULE_NAME_CAMEL}}Store.pagination.per_page,
+        search: search || undefined,
+      },
+    )
+  } catch (error) {
+    addToast(
+      getApiErrorMessage(error, 'Não foi possível realizar a busca.'),
+      'error',
+    )
+  }
+}
+
+onMounted(() => {
+  {{MODULE_NAME_CAMEL}}Store.fetch{{MODULE_NAME_PASCAL}}({
+    page: 1,
+    per_page: {{MODULE_NAME_CAMEL}}Store.pagination.per_page,
+  }).catch((error: unknown) => {
+    addToast(
+      getApiErrorMessage(error, 'Não foi possível carregar os registros.'),
+      'error',
+    )
+  })
+})
+</script>
+
+<template>
+  <div class="space-y-5">
+    <{{ MODULE_NAME_PASCAL }}List :{{ MODULE_NAME_CAMEL }}="{{
+      MODULE_NAME_CAMEL
+    }}Store.{{ MODULE_NAME_CAMEL }}" :pagination="{{
+      MODULE_NAME_CAMEL
+    }}Store.pagination" :loading="{{ MODULE_NAME_CAMEL }}Store.loading"
+    @create="handleCreate" @edit="handleEdit" @delete="handleDelete"
+    @page-change="handlePageChange" @search="handleSearch" /> <{{
+      MODULE_NAME_PASCAL
+    }}DeleteModal :open="isDeleteModalOpen" :{{ MODULE_SINGULAR_CAMEL }}="{{
+      MODULE_SINGULAR_CAMEL
+    }}ToDelete" :loading="{{ MODULE_NAME_CAMEL }}Store.deletingUuid ===
+    {{ MODULE_SINGULAR_CAMEL }}ToDelete?.uuid" @close="closeDeleteModal"
+    @confirm="confirmDelete" />
+  </div>
+</template>

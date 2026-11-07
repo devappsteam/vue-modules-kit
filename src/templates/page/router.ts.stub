@@ -1,0 +1,39 @@
+import type { RouteRecordRaw } from 'vue-router'
+
+export const {{MODULE_NAME_CAMEL}}Router: RouteRecordRaw[] = [
+  {
+    path: '/{{MODULE_NAME_KEBAB}}',
+    name: '{{MODULE_NAME_KEBAB}}',
+    component: () => import('./views/{{MODULE_NAME_PASCAL}}View.vue'),
+    meta: {
+      title: '{{MODULE_PLURAL_TITLE}}',
+      layout: 'default',
+      guestOnly: false,
+      requiresAuth: true,
+    },
+  },
+  {
+    path: '/{{MODULE_NAME_KEBAB}}/create',
+    name: '{{MODULE_NAME_KEBAB}}-create',
+    component: () =>
+      import('./views/{{MODULE_NAME_PASCAL}}FormView.vue'),
+    meta: {
+      title: 'Criar {{MODULE_SINGULAR_TITLE}}',
+      layout: 'default',
+      guestOnly: false,
+      requiresAuth: true,
+    },
+  },
+  {
+    path: '/{{MODULE_NAME_KEBAB}}/:uuid/edit',
+    name: '{{MODULE_NAME_KEBAB}}-edit',
+    component: () =>
+      import('./views/{{MODULE_NAME_PASCAL}}FormView.vue'),
+    meta: {
+      title: 'Editar {{MODULE_SINGULAR_TITLE}}',
+      layout: 'default',
+      guestOnly: false,
+      requiresAuth: true,
+    },
+  },
+]
